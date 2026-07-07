@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseBoard | Daily Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f4f6fb;
+        --bg-elev: #ffffff;
+        --bg-soft: #eef2f8;
+        --line: #d8dfeb;
+        --card: #ffffff;
+        --text: #182133;
+        --muted: #5e6c84;
+        --accent: #1f4fa3;
+        --accent-soft: #e6eeff;
+        --danger: #ba2e2e;
+        --ok: #1d7d57;
+        --shadow-soft: 0 8px 26px rgba(19, 34, 68, 0.08);
+        --radius-lg: 14px;
+        --radius-md: 10px;
+        --radius-sm: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          linear-gradient(180deg, #f7f9fd 0%, #f1f5fb 50%, #eef3fa 100%);
+        overflow-x: hidden;
+      }
+
+      .shell {
+        width: min(1200px, 94vw);
+        margin: 28px auto 38px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .fade-in {
+        opacity: 0;
+        transform: translateY(14px);
+        animation: rise 520ms ease forwards;
+      }
+
+      .fade-in.delay-1 {
+        animation-delay: 90ms;
+      }
+
+      .fade-in.delay-2 {
+        animation-delay: 170ms;
+      }
+
+      .fade-in.delay-3 {
+        animation-delay: 240ms;
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hero {
+        position: relative;
+        border-radius: 16px;
+        padding: 26px;
+        background: var(--bg-elev);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--line);
+      }
+
+      .hero-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .title {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.5rem, 3.4vw, 2.3rem);
+        letter-spacing: 0.3px;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      .clock {
+        display: grid;
+        gap: 5px;
+        min-width: 150px;
+        text-align: right;
+      }
+
+      .clock .time {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.45rem;
+        font-weight: 700;
+      }
+
+      .clock .date {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .clock .updated {
+        color: var(--muted);
+        font-size: 0.72rem;
+      }
+
+      .quick-stats {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .stat-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 11px 12px;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .stat-value {
+        margin-top: 5px;
+        font-size: 1.24rem;
+        font-weight: 700;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1.08fr 1fr 1fr;
+        gap: 16px;
+      }
+
+      .panel {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 16px;
+        min-height: 270px;
+      }
+
+      .panel-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.07rem;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 0.72rem;
+        color: var(--muted);
+        background: #fafcff;
+      }
+
+      .stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .section-label {
+        margin: 4px 0 4px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: #5c6c8a;
+      }
+
+      .tile {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 11px;
+        transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .tile:hover {
+        transform: translateY(-1px);
+        border-color: #b8c5dc;
+        box-shadow: 0 8px 22px rgba(27, 52, 99, 0.08);
+      }
+
+      .tile-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .tile-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .tile-meta {
+        margin: 6px 0 0;
+        font-size: 0.81rem;
+        color: var(--muted);
+      }
+
+      .tag {
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+
+      .tag-company {
+        color: #73510f;
+        background: #fff6df;
+        border: 1px solid #ead9ab;
+      }
+
+      .tag-project-1 {
+        color: #105d52;
+        background: #e5f8f4;
+        border: 1px solid #b8e4dc;
+      }
+
+      .tag-project-2 {
+        color: #214b86;
+        background: #eaf2ff;
+        border: 1px solid #c3d7f5;
+      }
+
+      .hover-detail {
+        margin: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        font-size: 0.78rem;
+        color: var(--muted);
+        line-height: 1.35;
+        transition: max-height 220ms ease, opacity 220ms ease, margin-top 220ms ease;
+      }
+
+      .tile:hover .hover-detail {
+        max-height: 70px;
+        opacity: 1;
+        margin-top: 7px;
+      }
+
+      .priority {
+        font-size: 0.72rem;
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-weight: 700;
+      }
+
+      .p-high {
+        color: #7f1c1c;
+        border: 1px solid #e7c0c0;
+        background: #fff1f1;
+      }
+
+      .p-medium {
+        color: #6f4b11;
+        border: 1px solid #ecd9b5;
+        background: #fff8ea;
+      }
+
+      .p-low {
+        color: #14583f;
+        border: 1px solid #b9dfcf;
+        background: #edf9f3;
+      }
+
+      .actions {
+        display: grid;
+        gap: 8px;
+      }
+
+      .action-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 9px;
+      }
+
+      .action-left {
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+      }
+
+      .action-checkbox {
+        width: 17px;
+        height: 17px;
+        margin-top: 2px;
+        accent-color: #1f4fa3;
+        cursor: pointer;
+      }
+
+      .action-row + .action-row {
+        padding-top: 8px;
+        border-top: 1px dashed #d5dcea;
+      }
+
+      .action-text {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.35;
+      }
+
+      .action-due {
+        color: var(--muted);
+        font-size: 0.76rem;
+      }
+
+      .action-source {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: #3f4f6e;
+      }
+
+      .action-hover-detail {
+        margin: 0;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        font-size: 0.78rem;
+        color: var(--muted);
+        line-height: 1.35;
+        transition: max-height 220ms ease, opacity 220ms ease, margin-top 220ms ease;
+      }
+
+      .action-row:hover .action-hover-detail {
+        max-height: 62px;
+        opacity: 1;
+        margin-top: 6px;
+      }
+
+      .action-row.done .action-text {
+        text-decoration: line-through;
+        color: #6f7f9b;
+      }
+
+      .action-row.done .action-due,
+      .action-row.done .action-source {
+        color: #90a0bb;
+      }
+
+      .action-row.done .priority {
+        opacity: 0.55;
+      }
+
+      .digest {
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 16px;
+      }
+
+      .digest-title {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.04rem;
+      }
+
+      .digest-note {
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .focus-strip {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .focus-chip {
+        font-size: 0.78rem;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: #22314f;
+        background: #f3f7ff;
+      }
+
+      .empty-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      @media (max-width: 1040px) {
+        .quick-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .panel.full {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 740px) {
+        .shell {
+          width: min(560px, 94vw);
+          margin-top: 18px;
+        }
+
+        .hero {
+          padding: 18px;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .clock {
+          text-align: left;
+        }
+
+        .quick-stats {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero fade-in">
+        <div class="hero-top">
+          <div>
+            <h1 class="title">Personal Ops Dashboard</h1>
+            <p class="subtitle">
+              One place for company + Project 1 + Project 2 meetings, messages, and decisions.
+            </p>
+          </div>
+          <div class="clock">
+            <span class="time" id="live-time">--:--</span>
+            <span class="date" id="live-date">Loading date</span>
+            <span class="updated" id="last-updated">Data not loaded</span>
+          </div>
+        </div>
+        <div class="quick-stats" id="quick-stats"></div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel fade-in delay-1">
+          <div class="panel-title-row">
+            <h2 class="panel-title">Today’s Meetings</h2>
+            <span class="pill" id="meeting-count">0 scheduled</span>
+          </div>
+          <p class="section-label">Confirmed</p>
+          <div class="stack" id="meeting-list"></div>
+          <p class="section-label">Placeholder / Tentative</p>
+          <div class="stack" id="placeholder-meeting-list"></div>
+        </article>
+
+        <article class="panel fade-in delay-2">
+          <div class="panel-title-row">
+            <h2 class="panel-title">Unified Messages</h2>
+            <span class="pill" id="message-count">0 items</span>
+          </div>
+          <div class="stack" id="message-list"></div>
+        </article>
+
+        <article class="panel fade-in delay-3 full">
+          <div class="panel-title-row">
+            <h2 class="panel-title">Action Queue</h2>
+            <span class="pill" id="action-count">0 pending</span>
+          </div>
+          <div class="actions" id="action-list"></div>
+        </article>
+      </section>
+
+      <section class="digest fade-in delay-3">
+        <h2 class="digest-title">Assistant Brief</h2>
+        <p class="digest-note" id="assistant-note"></p>
+        <div class="focus-strip" id="focus-strip"></div>
+      </section>
+    </main>
+
+    <script src="./dashboard-data.js"></script>
+    <script>
+      const dashboardData = window.PULSEBOARD_DATA || {
+        updatedAt: null,
+        meetings: [],
+        messages: [],
+        actions: [],
+        brief: {
+          note: "Dashboard data has not been generated yet.",
+          chips: []
+        }
+      };
+
+      const actionState = {
+        map: {},
+        storageAvailable: null
+      };
+
+      function tagClass(bucket) {
+        if (bucket === "company") return "tag-company";
+        if (bucket === "project-1") return "tag-project-1";
+        return "tag-project-2";
+      }
+
+      function priorityClass(priority) {
+        if (priority === "high") return "p-high";
+        if (priority === "medium") return "p-medium";
+        return "p-low";
+      }
+
+      function actionKey(action, index) {
+        return action.id || `${action.source || "source"}|${action.trigger || "trigger"}|${action.text || index}`;
+      }
+
+      function canUseStorage() {
+        if (actionState.storageAvailable !== null) return actionState.storageAvailable;
+        try {
+          const key = "__pulseboard_storage_test__";
+          window.localStorage.setItem(key, "1");
+          window.localStorage.removeItem(key);
+          actionState.storageAvailable = true;
+        } catch (error) {
+          actionState.storageAvailable = false;
+        }
+        return actionState.storageAvailable;
+      }
+
+      function loadActionMap() {
+        try {
+          if (!canUseStorage()) return { ...actionState.map };
+          const raw = window.localStorage.getItem("actionCompletionMap");
+          if (!raw) return { ...actionState.map };
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            actionState.map = { ...parsed };
+            return { ...actionState.map };
+          }
+        } catch (error) {
+          try {
+            if (window.localStorage) {
+              window.localStorage.removeItem("actionCompletionMap");
+            }
+          } catch (cleanupError) {
+            // Ignore storage cleanup failures in restricted browser contexts.
+          }
+        }
+        return { ...actionState.map };
+      }
+
+      function saveActionMap(map) {
+        actionState.map = { ...map };
+        try {
+          if (canUseStorage()) {
+            window.localStorage.setItem("actionCompletionMap", JSON.stringify(actionState.map));
+          }
+        } catch (error) {
+          actionState.storageAvailable = false;
+          // Keep in-memory map even when storage write fails.
+        }
+      }
+
+      function renderStats() {
+        const highPriorityCount = dashboardData.actions.filter((a) => a.priority === "high").length;
+        const uniqueSources = new Set(dashboardData.messages.map((m) => m.source)).size;
+
+        const stats = [
+          { label: "Meetings", value: dashboardData.meetings.length },
+          { label: "Messages", value: dashboardData.messages.length },
+          { label: "Urgent Actions", value: highPriorityCount },
+          { label: "Connected Feeds", value: uniqueSources }
+        ];
+
+        const statsEl = document.getElementById("quick-stats");
+        statsEl.innerHTML = stats
+          .map(
+            (stat) => `
+          <div class="stat-card">
+            <div class="stat-label">${stat.label}</div>
+            <div class="stat-value">${stat.value}</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      function renderMeetings() {
+        const placeholderMeetings = dashboardData.meetings.filter(
+          (meeting) => meeting.placeholder || meeting.title.toLowerCase().includes("placeholder")
+        );
+        const confirmedMeetings = dashboardData.meetings.filter(
+          (meeting) => !(meeting.placeholder || meeting.title.toLowerCase().includes("placeholder"))
+        );
+
+        document.getElementById("meeting-count").textContent =
+          `${confirmedMeetings.length} confirmed • ${placeholderMeetings.length} placeholder`;
+
+        document.getElementById("meeting-list").innerHTML = confirmedMeetings.length
+          ? confirmedMeetings
+              .map(
+                (meeting) => `
+            <div class="tile">
+              <div class="tile-top">
+                <h3 class="tile-title">${meeting.title}</h3>
+                <span class="tag ${tagClass(meeting.bucket)}">${meeting.source}</span>
+              </div>
+              <p class="tile-meta">${meeting.time}</p>
+              <p class="hover-detail">${meeting.detail}</p>
+            </div>
+          `
+              )
+              .join("")
+          : `<div class="tile"><p class="empty-note">No confirmed meeting data loaded. Check connector status if this looks wrong.</p></div>`;
+
+        document.getElementById("placeholder-meeting-list").innerHTML = placeholderMeetings.length
+          ? placeholderMeetings
+              .map(
+                (meeting) => `
+            <div class="tile">
+              <div class="tile-top">
+                <h3 class="tile-title">${meeting.title}</h3>
+                <span class="tag ${tagClass(meeting.bucket)}">${meeting.source}</span>
+              </div>
+              <p class="tile-meta">${meeting.time}</p>
+              <p class="hover-detail">${meeting.detail}</p>
+            </div>
+          `
+              )
+              .join("")
+          : `<div class="tile"><p class="tile-meta">No placeholder events today.</p></div>`;
+      }
+
+      function renderMessages() {
+        document.getElementById("message-count").textContent = `${dashboardData.messages.length} items`;
+        document.getElementById("message-list").innerHTML = dashboardData.messages.length
+          ? dashboardData.messages
+          .map(
+            (message) => `
+            <div class="tile">
+              <div class="tile-top">
+                <h3 class="tile-title">${message.title}</h3>
+                <span class="tag ${tagClass(message.bucket)}">${message.source}</span>
+              </div>
+              <p class="tile-meta">Received ${message.received}</p>
+              <p class="hover-detail">${message.detail}</p>
+            </div>
+          `
+          )
+          .join("")
+          : `<div class="tile"><p class="empty-note">No message items found for now.</p></div>`;
+      }
+
+      function renderActions() {
+        const stored = actionState.map;
+        const pendingCount = dashboardData.actions.filter((action, index) => !stored[actionKey(action, index)]).length;
+        document.getElementById("action-count").textContent = `${pendingCount} pending`;
+        document.getElementById("action-list").innerHTML = dashboardData.actions.length
+          ? dashboardData.actions
+          .map(
+            (action, index) => `
+            <div class="action-row ${stored[actionKey(action, index)] ? "done" : ""}" data-action-key="${actionKey(action, index)}">
+              <div class="action-left">
+                <input class="action-checkbox" type="checkbox" ${stored[actionKey(action, index)] ? "checked" : ""} />
+                <div>
+                <p class="action-text">${action.text}</p>
+                <span class="action-due">${action.due}</span>
+                <p class="action-source">Source: ${action.source} · ${action.trigger}</p>
+                <p class="action-hover-detail">${action.detail}</p>
+                </div>
+              </div>
+              <span class="priority ${priorityClass(action.priority)}">${action.priority.toUpperCase()}</span>
+            </div>
+          `
+          )
+          .join("")
+          : `<div class="tile"><p class="empty-note">No action items captured yet.</p></div>`;
+
+        const checkboxes = document.querySelectorAll(".action-checkbox");
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", (event) => {
+            const row = event.target.closest(".action-row");
+            const key = row.getAttribute("data-action-key");
+            const map = { ...actionState.map };
+
+            if (event.target.checked) {
+              row.classList.add("done");
+              map[key] = true;
+            } else {
+              row.classList.remove("done");
+              delete map[key];
+            }
+
+            saveActionMap(map);
+            const remaining = dashboardData.actions.filter((action, index) => !map[actionKey(action, index)]).length;
+            document.getElementById("action-count").textContent = `${remaining} pending`;
+          });
+        });
+      }
+
+      function renderBrief() {
+        const highUrgency = dashboardData.actions.filter((a) => a.priority === "high").length;
+        const note = dashboardData.brief?.note ||
+          (highUrgency > 0
+            ? `You have ${highUrgency} urgent action items today.`
+            : "No urgent action items are currently captured.");
+
+        document.getElementById("assistant-note").textContent = note;
+
+        const chips = dashboardData.brief?.chips || [];
+
+        document.getElementById("focus-strip").innerHTML = chips
+          .map((chip) => `<span class="focus-chip">${chip}</span>`)
+          .join("");
+      }
+
+      function refreshClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        const date = now.toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+
+        document.getElementById("live-time").textContent = time;
+        document.getElementById("live-date").textContent = date;
+      }
+
+      function renderLastUpdated() {
+        const el = document.getElementById("last-updated");
+        if (!dashboardData.updatedAt) {
+          el.textContent = "Data not generated";
+          return;
+        }
+
+        const updated = new Date(dashboardData.updatedAt);
+        el.textContent = `Updated ${updated.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })}`;
+      }
+
+      function initializeDashboard() {
+        actionState.map = loadActionMap();
+        renderStats();
+        renderMeetings();
+        renderMessages();
+        renderBrief();
+        renderLastUpdated();
+
+        try {
+          renderActions();
+        } catch (error) {
+          document.getElementById("action-list").innerHTML =
+            `<div class="tile"><p class="empty-note">Action list unavailable in current browser mode.</p></div>`;
+          document.getElementById("action-count").textContent = "Unavailable";
+        }
+
+        refreshClock();
+        setInterval(refreshClock, 1000);
+        setTimeout(() => window.location.reload(), 5 * 60 * 1000);
+      }
+
+      initializeDashboard();
+    </script>
+  </body>
+</html>
