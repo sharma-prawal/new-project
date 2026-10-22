@@ -17,3 +17,7 @@ HTML · CSS · JavaScript
 python3 -m http.server 8000
 # then open http://localhost:8000
 ```
+
+## License
+
+Released under the [MIT License](LICENSE).
